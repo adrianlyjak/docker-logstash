@@ -1,0 +1,11 @@
+#!/bin/bash
+if [ -z "$LOGSTASH_CONF" ]; then
+  if [ ! -f /opt/logs/logstash.conf ]; then
+  	echo "need to set LOGSTASH_CONF or attach a read-only volume to /opt/logs with a 'logstash.conf' file to proceed"
+  	exit 1
+  fi
+  export LOGSTASH_CONF="/opt/logstash-input/logstash.conf"
+fi
+CONFIG=$(echo $LOGSTASH_CONF | substvars)
+echo "starting logstash with config ... $CONFIG"
+logstash -e "$CONFIG"

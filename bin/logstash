@@ -1,0 +1,3 @@
+#!/bin/bash
+# can't symlink because logstash uses relative references
+./opt/logstash/bin/logstash $*

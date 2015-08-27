@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# read STDIN
+
+INPUT=$(cat $1)
+while read line
+do
+	escaped=$(echo $line | sed "s:\([<|>\"]\):\\\\\1:g") # this confusing ass replacement is just inserting a backslash before any of ["<", "|", ">", '"', '"']
+    eval echo "$escaped"
+done < "$1"

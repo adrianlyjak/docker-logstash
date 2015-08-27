@@ -18,17 +18,18 @@
 ```
 $ git clone https://github.com/edefaria/patch-gelf-output-logstash.git
 $ cd docker-logstash
-$ docker build -t docker-logstash .
+$ docker build -t logstash-tcp .
 ```
 
 ### RUN
 
 ```
-docker run -p 1514:1514 -p 5043:5043 -p 5001:5001 -p 10514:10514 -p 12200:12200/udp -e TIMEZONE=Europe/Paris --name docker-logstash docker-logstash
+docker run --name logstash-tcp logstash-tcp
 ```
 
 ### Usage
 INPUT Possible :
+
 ```
 Port 1514 is required if you use syslog.
 Port 10514 is required if you use syslog with tls on tcp.
@@ -42,6 +43,7 @@ Add docker args: "-v /etc/logstash/conf.d/:/etc/logstash/conf.d/".
 If you do that, please set environment variable KEEP_CONFIG=true for keeping at startup your current configuration.
 
 Environment variable:
+
 ```
 DEBUG=1 => launch logstash in DEBUG mode
 TIMEZONE=Europe/Paris => time zone of the docker, please set to the same timezone as your syslog server
@@ -56,6 +58,7 @@ GELF_STATIC_FIELDS => list of context values to add to your stream like "app:tes
   * rsyslog
 
 Edit: /etc/rsyslog.d/60-forward.conf
+
 ```
 $template raw,"<%pri%>%timestamp:::date-rfc3339% %hostname% %syslogtag%%msg%\n"
 *.* @@$HOSTNAME:1514;raw
@@ -64,6 +67,7 @@ $template raw,"<%pri%>%timestamp:::date-rfc3339% %hostname% %syslogtag%%msg%\n"
   * rsyslog-gnutls
 
 Edit: /etc/rsyslog.d/60-forward.conf
+
 ```
 $DefaultNetstreamDriver gtls # use gtls netstream driver
 $ActionSendStreamDriverMode 1 # require TLS for the connection
@@ -75,6 +79,7 @@ $template GRAYLOGRFC5424,"<%PRI%>%PROTOCOL-VERSION% %timestamp:::date-rfc3339% %
   * syslog-ng
 
 Edit:  /etc/syslog-ng/conf.d/22-forward.conf
+
 ```
 destination remote_log_server { tcp("$HOSTNAME" port(1514)); };
 log { source(src); destination(remote_log_server); };
@@ -83,6 +88,7 @@ log { source(src); destination(remote_log_server); };
   * logstash-forwaders
 
 Edit: /path_installation_of_logstash-forwarder/logstash-forwarder.conf
+
 ```
 {
   "network": {
@@ -105,6 +111,7 @@ Edit: /path_installation_of_logstash-forwarder/logstash-forwarder.conf
   * logstash with gelf (UPD)
 
 Edit: /etc/logstash.conf
+
 ```
 output {
   gelf {
@@ -121,6 +128,7 @@ By default "logstash.conf" is generated with:
 * output gelf modified by docker environment variable.
 
 Initial configuration: logstash.conf
+
 ```
 input {
   tcp {
