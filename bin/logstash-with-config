@@ -2,12 +2,15 @@
 MOUNT_DIR="/opt/logs"
 CONFIG_PATH="$MOUNT_DIR/logstash.conf"
 if [ ! -z "$LOGSTASH_CONF" ]; then
-  CONFIG=$(substvars "$LOGSTASH_CONF")
+  CONFIG="$LOGSTASH_CONF"
 elif [ -f "$CONFIG_PATH" ]; then
-  CONFIG=$(substvars $CONFIG_PATH)
+  CONFIG=$(cat $CONFIG_PATH)
 else
   echo "need to set LOGSTASH_CONF or attach a read-only volume to $MOUNT_DIR with a 'logstash.conf' file to proceed"
   exit 1
+fi
+if [ -z "$NO_ENVIRONMENT_SUBSTITUTIONS_PLEASE" ]; then
+	CONFIG=$(substvars <<< "$CONFIG")
 fi
 echo "starting logstash with config $CONFIG ... "
 TMP_CONF="/var/tmp/logstash.conf"
