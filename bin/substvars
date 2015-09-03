@@ -2,9 +2,11 @@
 
 # read STDIN
 
-INPUT=$(cat $1)
-while read line
+while read -r line
 do
-	escaped=$(echo $line | sed "s:\([<|>\"]\):\\\\\1:g") # this confusing ass replacement is just inserting a backslash before any of ["<", "|", ">", '"', '"']
+	# this confusing ass replacement is just inserting a backslash before any special characters. 
+    # literal backslashes before special symbols i.e. `\1` need LOTS of escaping. 
+    # ...I just added backslashes until it worked. There's probably more characters that need escaping
+	escaped=$(sed "s:\([()<|>\"\\\]\):\\\\\1:g" <<< $line)
     eval echo "$escaped"
-done < "$1"
+done < "${1:-/dev/stdin}"
